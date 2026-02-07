@@ -12,6 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
     - name: set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -19,10 +20,17 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Fix 2022 memory issue  # 就加这一行关键修复
+    - name: Fix ancient memory issue
       run: echo "org.gradle.jvmargs=-Xmx4g" >> gradle.properties
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+      
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build --no-daemon
+      
+    - name: Upload APK  # 保存产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: ancient-compose-apk
+        path: app/build/outputs/apk/**/*.apk
